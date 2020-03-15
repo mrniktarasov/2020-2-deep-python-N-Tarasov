@@ -3,36 +3,47 @@ from datetime import datetime
 
 
 class CurrencyAdder:
-    def __init__(self, curr, name='RUB'):
+    def __init__(self, curr, name=''):
         self.value = curr
         self.name = name
 
     def __repr__(self):
-        return '{value: ' + str(self.value) + ', name: ' + str(self.name) + '}'
+        return 'CurrencyAdder: {value: ' + str(self.value) + ', name: ' + str(self.name) + '}'
 
     def __str__(self):
-        return 'Currency (value= ' + str(self.value) + ', name= ' + self.name + ')'
+        return '' + str(self.value) + ' ' + self.name
 
     def __add__(self, other):
         try:
             if self.name == other.name:
-                return self.value + other.curr
+                return CurrencyAdder(self.value + other.value, self.name)
             else:
                 rates = self._get_currency()
-                if self.name != 'RUB':
+                if self.name != 'RUB' and self.name != '':
                     try:
                         curr1 = rates[self.name].value
                     except KeyError as e:
                         raise ValueError('Undefined unit: {}'.format(e.args[0]))
                 else:
                     curr1 = 1
-                try:
-                    curr2 = rates[other.name].value
-                except KeyError as e:
-                    raise ValueError('Undefined unit: {}'.format(e.args[0]))
-                return round(float((self.value * curr1 + other.value * curr2)/curr1), 2)
+                if other.name != '':
+                    try:
+                        curr2 = rates[other.name].value
+                    except KeyError as e:
+                        raise ValueError('Undefined unit: {}'.format(e.args[0]))
+                else:
+                    curr2 = 1
+                if self.name != '' and other.name != '':
+                    cur = round(float((self.value * curr1 + other.value * curr2)/curr1), 2)
+                    return CurrencyAdder(cur, self.name)
+                elif self.name == '':
+                    cur = round(float((self.value + other.value)), 2)
+                    return CurrencyAdder(cur, other.name)
+                else:
+                    cur = round(float((self.value + other.value)), 2)
+                    return CurrencyAdder(cur, self.name)
         except AttributeError:
-            return self.value + other
+            return CurrencyAdder(self.value + other, self.name)
 
     def _get_currency(self):
         rates = ExchangeRates(datetime.now())
