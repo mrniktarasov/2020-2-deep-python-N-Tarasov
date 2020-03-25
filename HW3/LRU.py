@@ -22,11 +22,8 @@ class ICache:
 
     def delete(self, key: str) -> None:
         if self.capacity > 0:
-            try:
-                self.cache.move_to_end(key)
-                self.cache.popitem()
-            except KeyError:
-                raise ValueError('Wrong key {}'.fromat(key))
+            self.cache.move_to_end(key)
+            self.cache.popitem()
             self.capacity += 1
         else:
             return ''
