@@ -119,7 +119,6 @@ class Modules:
                 self.name = 'VARCHAR({0}) NOT NULL'.format(max_len)
 
     class Module:
-        values = LineValidation()
         id_field = 'id'
         id_count = 0
         row_types = []
@@ -165,17 +164,16 @@ class Modules:
             return command
 
         def _isCorrectType(self, value, cur_type):
-            if type(value) != 'char':
-                if type(value) == cur_type.type:
-                    return True
-                else:
-                    raise ValueError('Value {0} is incorrect type'.format(value))
-            else:
-                if len(value) <= cur_type.max_length:
-                    return True
-                else:
-                    return False
-
+            if type(value) == cur_type.type:
+                return True
+            try:
+                if value.type == 'char':
+                    if len(value) <= cur_type.max_length:
+                        return True
+                    else:
+                        return False
+            except AttributeError:
+                raise ValueError('Value {0} is incorrect type'.format(value))
 
         def _make_cond_command(self, command, dic):
             for key, value in dic.items():
@@ -184,6 +182,7 @@ class Modules:
             return command
 
         def add(self, values):
+            self._is_list_or_tuple(values)
             self.id_count += 1
             command = 'INSERT INTO {tb_name} VALUES ({id}, '.format(
                 tb_name=self.__class__.__name__,
@@ -191,6 +190,12 @@ class Modules:
             )
             command = self._make_command(command, values)
             self._do_sql(command)
+
+        def _is_list_or_tuple(self, values):
+            if type(values) != tuple and type(values) != list:
+                raise ValueError('Must be tuple  or list')
+            if len(values) > len(self.__dict__.keys()):
+                raise ValueError('Overflow')
 
         def get(self, **kwargs):
             command = 'SELECT * FROM {table_name} WHERE ('.format(table_name=self.__class__.__name__)

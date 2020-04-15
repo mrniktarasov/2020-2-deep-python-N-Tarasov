@@ -14,8 +14,8 @@ val = ('Nikita', "Tarasov", 1345)
 u.add(val)
 val = ("Alex", 'Jones', 2312)
 u.add(val)
-u.all()
-u.get(name='Nikita')
-u.delete(currency=2312)
+# print(u.all())
+# print(u.get(name='Nikita'))
+# u.delete(currency=2312)
 
 
