@@ -39,5 +39,5 @@ def matrix(array):
 
 
 if __name__ == '__main__':
-    arr = [1, 34, 56, 34, 96, 4, 70, 154]
+    arr = [3]*40
     matrix(arr)

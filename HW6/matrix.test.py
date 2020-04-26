@@ -10,10 +10,11 @@ class MyTestCase(unittest.TestCase):
         arr = [5, 5, 5, 5, 5, 5, 5, 5]
         self.assertEqual(matrix(arr), [78125, 78125, 78125, 78125, 78125, 78125, 78125, 78125])
 
-    @patch('matrix.matrix', return_value=[59049]*10)
     def test_mock_matrix(self):
-        arr = [3]*10
-        self.assertEqual(matrix(arr), [59049]*10)
+        with patch('matrix.matrix') as mock_matrix:
+            mock_matrix.return_value = [59049]*10
+            arr = [3]*10
+            self.assertEqual(mock_matrix(arr), [59049]*10)
 
 
 if __name__ == '__main__':
