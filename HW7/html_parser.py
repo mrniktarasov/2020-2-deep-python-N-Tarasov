@@ -4,10 +4,11 @@ import string
 from collections import OrderedDict
 import socket
 from HW7.HttpResponse import HttpResponse
+from HW7.HttpRequest import HttpRequest
 
 
 def get_text_from_site(url):
-    html = urllib.request.urlopen(url).read()
+    html = urllib.request.urlopen(url.decode('utf-16')).read()
     soup = BeautifulSoup(html, 'lxml')
     # kill all script and style elements
     for script in soup(["script", "style"]):
@@ -42,6 +43,7 @@ def make_unnecessary_words_dict():
             'for':  True,
             'of':   True,
             'by':   True,
+            's':    True,
     }
 
 
@@ -61,20 +63,24 @@ def count_words(text):
 def top_ten_words(url):
     text = get_text_from_site(url)
     words = count_words(text)
-    top = sorted(words.values(), reverse=True)[:10]
+    top = sorted(words.values(), reverse=True)[0:10]
     result = OrderedDict()
     for max_value in top:
         for key, value in words.items():
-            if value == max_value:
-                result[key] = max_value
+            if value == max_value and not result.get(key):
+                result[key] = value
                 break
     return result
 
 
-def http_handler(func):
-    def wrapper(*args, **kwargs):
-        with socket.socket() as sock:
-            sock.bind(('127.0.0.1', 10001))
+def make_response(request):
+    result = top_ten_words(request.url)
+    return HttpResponse(result)
+
+
+def run_server(host, port):
+    with socket.socket() as sock:
+            sock.bind((host, port))
             sock.listen()
             conn, addr = sock.accept()
             conn.settimeout(10)
@@ -87,13 +93,13 @@ def http_handler(func):
                         break
                     if not data:
                         break
-                    response = func(data)
-                    conn.send(response.json)
-        return wrapper
+                    request = HttpRequest(data)
+                    response = make_response(request)
+                    conn.send(response.json.encode('utf-16'))
+                conn.close()
 
 
-@http_handler
-def html_top_ten_words(request):
-    result = top_ten_words(request.url)
-    return HttpResponse(result)
-
+if __name__ == '__main__':
+    host = '127.0.0.1'
+    port = 10001
+    run_server(host, port)
