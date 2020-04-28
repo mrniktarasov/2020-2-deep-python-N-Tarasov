@@ -1,7 +1,7 @@
 import urllib.request
 from bs4 import BeautifulSoup
 import string
-import pickle
+import jsonpickle
 from collections import OrderedDict
 import socket
 from HW7.HttpResponse import HttpResponse
@@ -75,9 +75,9 @@ def run_server(host, port):
                         break
                     if not data:
                         break
-                    request = pickle.loads(data)
+                    request = jsonpickle.decode(data)
                     response = make_response(request)
-                    conn.send(response.to_json().encode('utf-8'))
+                    conn.send(jsonpickle.encode(response).encode('utf-8'))
                 conn.close()
 
 
