@@ -1,27 +1,27 @@
 import urllib.request
 from bs4 import BeautifulSoup
 import string
+import pickle
 from collections import OrderedDict
 import socket
 from HW7.HttpResponse import HttpResponse
-from HW7.HttpRequest import HttpRequest
+from HW7.english_pretexts import english_pretexts
 
 
 def get_text_from_site(url):
-    html = urllib.request.urlopen(url.decode('utf-16')).read()
+    html = urllib.request.urlopen(url).read()
     soup = BeautifulSoup(html, 'lxml')
-    # kill all script and style elements
+    # удаление скриптов и стилей
     for script in soup(["script", "style"]):
-        script.extract()  # rip it out
+        script.extract()
 
-    # get text
     text = soup.get_text()
 
-    # break into lines and remove leading and trailing space on each
+    # убрает начальные и конечные пробелы в каждой
     lines = (line.strip() for line in text.splitlines())
-    # break multi-headlines into a line each
+    # разбиение заголовков
     chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-    # drop blank lines
+    # удалить пустые строки
     text = '\n'.join(chunk for chunk in chunks if chunk).lower()
     mask = string.ascii_lowercase + ' ' + ''
     for ch in text:
@@ -30,29 +30,11 @@ def get_text_from_site(url):
     return text
 
 
-def make_unnecessary_words_dict():
-    return {
-            '':     True,
-            'a':    True,
-            'an':   True,
-            'the':  True,
-            'in':   True,
-            'at':   True,
-            'to':   True,
-            'on':   True,
-            'for':  True,
-            'of':   True,
-            'by':   True,
-            's':    True,
-    }
-
-
 def count_words(text):
-    art = make_unnecessary_words_dict()
     words = dict()
     text_arr = text.split(' ')
     for word in text_arr:
-        if not art.get(word):
+        if not english_pretexts.get(word):
             if words.get(word):
                 words[word] += 1
             else:
@@ -83,7 +65,7 @@ def run_server(host, port):
             sock.bind((host, port))
             sock.listen()
             conn, addr = sock.accept()
-            conn.settimeout(10)
+            conn.settimeout(5)
             with conn:
                 while True:
                     try:
@@ -93,9 +75,9 @@ def run_server(host, port):
                         break
                     if not data:
                         break
-                    request = HttpRequest(data)
+                    request = pickle.loads(data)
                     response = make_response(request)
-                    conn.send(response.json.encode('utf-16'))
+                    conn.send(response.to_json().encode('utf-8'))
                 conn.close()
 
 

@@ -1,4 +1,4 @@
-import socket
+import json
 
 
 class HttpRequest:
@@ -6,4 +6,3 @@ class HttpRequest:
         self.domain = host
         self.port = port
         self.url = url
-
