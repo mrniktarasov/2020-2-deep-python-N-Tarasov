@@ -51,7 +51,7 @@ class Parser(threading.Thread):
         return text
 
 
-def run_server(host, port):
+def run_server(host='127.0.0.1', port=10001):
     lock = threading.Lock()
     queue = Queue()
     counter = 0
@@ -64,7 +64,7 @@ def run_server(host, port):
             t.start()
         while True:
             conn, addr = sock.accept()
-            conn.settimeout(30)
+            conn.settimeout(5)
             try:
                 data = conn.recv(1024)
             except socket.timeout:
