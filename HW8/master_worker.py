@@ -17,7 +17,7 @@ class Parser(threading.Thread):
         threading.Thread.__init__(self)
         self.queue = queue
         self.lock = lock
-        self.name = 'Thread N{}'.format(i)
+        self.name = 'Thread N{}'.format(i + 1)
 
     def run(self):
         while True:
