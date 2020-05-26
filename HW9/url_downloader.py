@@ -2,13 +2,15 @@ import asyncio
 import aiohttp
 from sys import argv
 from parse_url import get_text_from_site
+import datetime
 
 
 async def fetch(url, session):
     async with session.get(url) as resp:
         data = await resp.read()
+        print(f'{datetime.datetime.now()} parcing')
         text = get_text_from_site(data)
-        print(f"{url} downloaded \n")
+        print(f"{datetime.datetime.now()} {url} downloaded \n")
 
 
 async def main(connections_num, file_with_urls):
