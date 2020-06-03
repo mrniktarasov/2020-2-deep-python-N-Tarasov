@@ -5,7 +5,7 @@ class Theatre:
             with open(self.filename, 'r') as f:
                 for line in f:
                     l = len(line) - 1
-                    self.matrix.append(line[0 : l].strip().split(sep=' '))
+                    self.matrix.append(line[0: l].strip().split(sep=' '))
 
         def count_free(self):
             count = 0
