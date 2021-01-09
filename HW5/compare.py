@@ -10,7 +10,6 @@ if __name__ == '__main__':
 
     first_matrix_c = Matrix(first_matrix)
     second_matrix_c = Matrix(second_matrix)
-
     start = time.time()
     c_answer = first_matrix_c.mult_matrix(second_matrix_c)
     result_c = time.time() - start
